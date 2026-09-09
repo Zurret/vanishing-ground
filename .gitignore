@@ -1,0 +1,19 @@
+# Gradle
+.gradle/
+build/
+
+# IDEs
+.vscode/
+.idea/
+*.iml
+
+# Fabric Loom
+loom-cache/
+
+# Generated artifacts
+*.jar
+*.class
+
+# Operating system files
+.DS_Store
+Thumbs.db

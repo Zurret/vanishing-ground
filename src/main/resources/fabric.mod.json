@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "vanishingground",
+  "version": "${version}",
+  "name": "Vanishing Ground",
+  "description": "Solid ground you walk away from disappears once no player is standing on it anymore.",
+  "authors": [
+    "Zurret"
+  ],
+  "contact": {
+    "homepage": "https://zurret.de"
+  },
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "de.zurret.vanishingground.VanishingGroundMod"
+    ]
+  },
+  "mixins": [],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~26.2",
+    "fabric-api": "*",
+    "java": ">=25"
+  }
+}
