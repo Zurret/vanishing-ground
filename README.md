@@ -61,3 +61,12 @@ Can also be extended with a data pack:
 - **Delay:** Controlled by `delayTicks` in the configuration. The default
   value 0 removes blocks immediately. With a value greater than 0, occupancy
   is checked again before the actual removal.
+
+## Changelogs
+
+### 1.0.1
+
+ - Add Commands.
+
+### 1.0.0
+ - Initial release.

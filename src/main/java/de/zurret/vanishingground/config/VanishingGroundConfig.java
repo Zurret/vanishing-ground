@@ -30,13 +30,61 @@ import java.nio.file.Path;
  *                              ...) is protected, to avoid silently
  *                              destroying stored items or state.
  */
-public record VanishingGroundConfig(boolean enabled, int delayTicks, boolean destroyFluids,
-		boolean destroyBlockEntities) {
+public final class VanishingGroundConfig {
+
+	private boolean enabled;
+	private int delayTicks;
+	private boolean destroyFluids;
+	private boolean destroyBlockEntities;
 
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	private static final Path CONFIG_PATH = FabricLoader.getInstance()
 			.getConfigDir()
 			.resolve(VanishingGroundMod.MOD_ID + ".json");
+
+	public VanishingGroundConfig(boolean enabled, int delayTicks, boolean destroyFluids,
+			boolean destroyBlockEntities) {
+		this.enabled = enabled;
+		this.delayTicks = Math.max(0, delayTicks);
+		this.destroyFluids = destroyFluids;
+		this.destroyBlockEntities = destroyBlockEntities;
+	}
+
+	public boolean enabled() {
+		return enabled;
+	}
+
+	public int delayTicks() {
+		return delayTicks;
+	}
+
+	public boolean destroyFluids() {
+		return destroyFluids;
+	}
+
+	public boolean destroyBlockEntities() {
+		return destroyBlockEntities;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+		save();
+	}
+
+	public void setDelayTicks(int delayTicks) {
+		this.delayTicks = Math.max(0, delayTicks);
+		save();
+	}
+
+	public void setDestroyFluids(boolean destroyFluids) {
+		this.destroyFluids = destroyFluids;
+		save();
+	}
+
+	public void setDestroyBlockEntities(boolean destroyBlockEntities) {
+		this.destroyBlockEntities = destroyBlockEntities;
+		save();
+	}
 
 	public static VanishingGroundConfig loadOrCreate() {
 		if (Files.exists(CONFIG_PATH)) {

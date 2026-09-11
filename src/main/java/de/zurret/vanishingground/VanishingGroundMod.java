@@ -1,6 +1,7 @@
 package de.zurret.vanishingground;
 
 import de.zurret.vanishingground.config.VanishingGroundConfig;
+import de.zurret.vanishingground.command.VanishingGroundCommand;
 import de.zurret.vanishingground.event.PlayerLifecycleHandler;
 import de.zurret.vanishingground.event.PlayerMovementHandler;
 import de.zurret.vanishingground.gamerule.ModGameRules;
@@ -30,6 +31,7 @@ public final class VanishingGroundMod implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		VanishingGroundConfig config = VanishingGroundConfig.loadOrCreate();
+		VanishingGroundCommand.register(config);
 
 		PlayerMovementHandler movementHandler =
 				new PlayerMovementHandler(tracker, protectionRegistry, scheduler, config);
