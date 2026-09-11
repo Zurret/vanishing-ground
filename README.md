@@ -18,7 +18,6 @@ This version targets Minecraft 26.2, Fabric Loader 0.19.5, and Fabric API `0.159
 
 ## Usage
 
-<<<<<<< HEAD
 The mod is disabled by default so installing it cannot wipe an existing world.
 
 Enable it with:
@@ -101,81 +100,6 @@ Permission level 2 or higher is required.
 * `sneak protect` keeps the block you step off while sneaking, which is useful while placing blocks next to a live course.
 * `flyleave keep` (default) does not treat takeoff or mounting as walking away. `flyleave vanish` does.
 * Immune players are never tracked. The player must be online when added or removed.
-=======
-The mod is disabled by default.
-
-Enable it by setting `enabled` to `true` in `config/vanishingground.json`, or use the in-game command:
-
-```text
-/vanishingground enable
-```
-
-The configuration file is created on first launch.
-
-## Commands
-
-Vanishing Ground provides in-game commands for changing and inspecting its configuration.
-
-All commands require permission level 2 or higher.
-
-### Enable or disable
-
-```text
-/vanishingground enable
-/vanishingground disable
-```
-
-Enables or disables Vanishing Ground. The change is saved to the configuration file.
-
-### Check the current configuration
-
-```text
-/vanishingground status
-```
-
-Displays the current configuration and mod status.
-
-### Set the removal delay
-
-```text
-/vanishingground delay <ticks>
-```
-
-Sets the number of ticks to wait before removing an unoccupied block.
-
-For example:
-
-```text
-/vanishingground delay 0
-/vanishingground delay 20
-```
-
-`0` removes blocks immediately. `20` waits approximately one second.
-
-### Configure fluid destruction
-
-```text
-/vanishingground fluids allow
-/vanishingground fluids protect
-```
-
-Controls whether fluids can be removed.
-
-Fluids are protected by default.
-
-### Configure block entity destruction
-
-```text
-/vanishingground block_entities allow
-/vanishingground block_entities protect
-```
-
-Controls whether blocks containing block entities can be removed.
-
-Blocks with block entities are protected by default.
-
-All configuration changes made through commands are persisted to `config/vanishingground.json`.
->>>>>>> 5330f23e1540a28758021289d6ee163ca4d75267
 
 ## Configuration
 
@@ -199,22 +123,10 @@ All configuration changes made through commands are persisted to `config/vanishi
 }
 ```
 
-<<<<<<< HEAD
 Files written by 1.0.x and 1.1.0 are upgraded on load. Missing fields use the defaults above.
-=======
-* `enabled`: Enables or disables the mod.
-* `delayTicks`: Number of ticks to wait before removing an unoccupied block.
-* `destroyFluids`: Allows fluids to be removed when enabled.
-* `destroyBlockEntities`: Allows blocks with block entities to be removed when enabled.
-
-Protected blocks can also be extended with a data pack tag:
-
-`data/vanishingground/tags/block/protected.json`
->>>>>>> 5330f23e1540a28758021289d6ee163ca4d75267
 
 Data pack tags:
 
-<<<<<<< HEAD
 * `data/vanishingground/tags/block/protected.json` used in blacklist mode. The shipped tag already covers command blocks, spawners, chests, barriers and similar blocks you almost never want deleted.
 * `data/vanishingground/tags/block/vanishing.json` used in whitelist mode. The shipped tag is a small parkour-oriented starter list. Replace or extend it with a datapack.
 
@@ -264,28 +176,6 @@ Pushes and pull requests to `main` run `./gradlew build` and upload the JAR.
 ### 1.0.1
 
 * In-game configuration commands.
-=======
-* **Support block detection:** Uses vanilla collision-shape logic (`getLandingPos()`), rather than a floored block position. This correctly handles slabs, stairs, snow layers, carpets, fences, trapdoors, and other partial blocks without special-case code for individual block types.
-* **No persistent player state:** Only the current support position per online player is stored (`UUID -> Dimension + BlockPos`), together with an occupancy map for multiplayer safety. Memory usage grows with the number of tracked players, not with the length of the game.
-* **Multiplayer:** A block is scheduled for removal only after its occupant set becomes empty. If another player is still standing on it, the block remains in place.
-* **Fluids:** Protected by default (`destroyFluids = false`) so fluid simulation is not altered by side effects.
-* **Block entities:** Protected by default (`destroyBlockEntities = false`) to prevent items from being lost in chests and other blocks.
-* **Skipped players:** Spectators, players riding vehicles such as boats, minecarts, or horses, flying players, and players for which `isOnGround() == false` do not update ground tracking. This also covers swimming and Elytra flight.
-* **Death, respawn, dimension changes, and disconnects:** The stored tracking entry is cleared deliberately without removing a block.
-* **Delayed removal:** When `delayTicks` is greater than zero, the block's occupancy is checked again before removal. If a player returns during the delay, the scheduled removal is cancelled.
-
-## Changelog
-
-### 1.0.1
-
-* Added in-game commands for configuring Vanishing Ground.
-* Added commands to enable and disable the mod.
-* Added a status command for inspecting the current configuration.
-* Added commands for configuring the block removal delay.
-* Added commands for allowing or protecting fluids.
-* Added commands for allowing or protecting blocks with block entities.
-* Command-based configuration changes are saved automatically.
->>>>>>> 5330f23e1540a28758021289d6ee163ca4d75267
 
 ### 1.0.0
 
