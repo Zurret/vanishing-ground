@@ -4,65 +4,97 @@ import de.zurret.vanishingground.config.VanishingGroundConfig;
 import de.zurret.vanishingground.protection.BlockProtectionRegistry;
 import de.zurret.vanishingground.tracking.GlobalBlockPos;
 import de.zurret.vanishingground.tracking.SupportPositionTracker;
-import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * Handles the optional {@code vanishingGroundDelay} grace period. A
- * position scheduled for removal is re-checked for occupancy at execution
- * time - if a player has moved back onto it in the meantime, the removal
- * is silently dropped instead of pulling the block out from under them.
+ * Handles the optional delayTicks grace period. Re-checks occupancy at
+ * execution time. A later schedule for the same position replaces the
+ * earlier one so stepping on and off the same block does not queue
+ * several removals.
  */
 public final class PendingRemovalScheduler {
 
 	private record PendingRemoval(GlobalBlockPos pos, long executeAtTick) {
 	}
 
-	private final List<PendingRemoval> pending = new ArrayList<>();
+	private final Map<GlobalBlockPos, PendingRemoval> pending = new HashMap<>();
+	private final Set<GlobalBlockPos> warned = new HashSet<>();
 
 	public void schedule(GlobalBlockPos pos, long executeAtTick) {
-		pending.add(new PendingRemoval(pos, executeAtTick));
+		pending.put(pos, new PendingRemoval(pos, executeAtTick));
+		warned.remove(pos);
+	}
+
+	public void clear() {
+		pending.clear();
+		warned.clear();
 	}
 
 	public void tick(MinecraftServer server, SupportPositionTracker tracker,
-			BlockProtectionRegistry protectionRegistry, VanishingGroundConfig config) {
+			BlockProtectionRegistry protectionRegistry, RestoreScheduler restoreScheduler,
+			VanishingGroundConfig config) {
 		if (pending.isEmpty()) {
+			return;
+		}
+		if (!config.enabled()) {
+			clear();
 			return;
 		}
 
 		long currentTick = server.getTickCount();
-		Iterator<PendingRemoval> iterator = pending.iterator();
+		int warningTicks = config.warningTicks();
+
+		Iterator<Map.Entry<GlobalBlockPos, PendingRemoval>> iterator = pending.entrySet().iterator();
 		while (iterator.hasNext()) {
-			PendingRemoval removal = iterator.next();
+			PendingRemoval removal = iterator.next().getValue();
+
+			if (tracker.isOccupied(removal.pos())) {
+				iterator.remove();
+				warned.remove(removal.pos());
+				continue;
+			}
+
+			if (warningTicks > 0 && !warned.contains(removal.pos())
+					&& currentTick >= removal.executeAtTick() - warningTicks
+					&& currentTick < removal.executeAtTick()) {
+				fireWarning(server, removal.pos());
+				warned.add(removal.pos());
+			}
+
 			if (currentTick < removal.executeAtTick()) {
 				continue;
 			}
+
 			iterator.remove();
-
-			if (tracker.isOccupied(removal.pos())) {
-				// A player re-entered this position before the delay elapsed.
-				continue;
-			}
-
-			ServerLevel world = server.getLevel(removal.pos().dimension());
-			if (world == null) {
-				continue;
-			}
-
-			BlockState state = world.getBlockState(removal.pos().pos());
-			if (protectionRegistry.isProtected(state, world, removal.pos().pos(), config)) {
-				continue;
-			}
-
-			world.setBlock(removal.pos().pos(), Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+			warned.remove(removal.pos());
+			execute(server, removal.pos(), protectionRegistry, restoreScheduler, config);
 		}
+	}
+
+	private void fireWarning(MinecraftServer server, GlobalBlockPos pos) {
+		ServerLevel world = server.getLevel(pos.dimension());
+		if (world != null) {
+			WarningEffects.fire(world, pos.pos());
+		}
+	}
+
+	private void execute(MinecraftServer server, GlobalBlockPos pos, BlockProtectionRegistry protectionRegistry,
+			RestoreScheduler restoreScheduler, VanishingGroundConfig config) {
+		ServerLevel world = server.getLevel(pos.dimension());
+		if (world == null) {
+			return;
+		}
+		BlockRemovalService.removeIfEligible(server, world, pos, protectionRegistry, restoreScheduler, config);
+	}
+
+	public int pendingCount() {
+		return pending.size();
 	}
 }

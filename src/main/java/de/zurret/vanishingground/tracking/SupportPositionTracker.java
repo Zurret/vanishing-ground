@@ -76,6 +76,16 @@ public final class SupportPositionTracker {
 		return set != null && !set.isEmpty();
 	}
 
+	/** Number of players currently being tracked. Exposed for {@code /vanishingground debug}. */
+	public int trackedPlayerCount() {
+		return currentSupport.size();
+	}
+
+	/** Number of distinct block positions currently occupied by at least one player. */
+	public int occupiedPositionCount() {
+		return occupants.size();
+	}
+
 	private Optional<GlobalBlockPos> releaseOccupant(GlobalBlockPos pos, UUID playerId) {
 		Set<UUID> set = occupants.get(pos);
 		if (set == null) {

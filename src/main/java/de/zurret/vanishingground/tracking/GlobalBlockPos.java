@@ -6,10 +6,13 @@ import net.minecraft.world.level.Level;
 
 /**
  * Identifies a block position across dimensions.
- * <p>
- * {@code record}s already provide value-based {@link #equals(Object)} and
- * {@link #hashCode()}, which is required here since instances are used as
- * hash map keys in {@link SupportPositionTracker}.
+ * The stored {@link BlockPos} is always made immutable so the value is
+ * safe as a hash map key even if the caller passed a mutable instance
+ * such as {@code BlockPos.MutableBlockPos} from {@code getOnPos()}.
  */
 public record GlobalBlockPos(ResourceKey<Level> dimension, BlockPos pos) {
+
+	public GlobalBlockPos {
+		pos = pos.immutable();
+	}
 }

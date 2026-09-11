@@ -1,0 +1,18 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:stone",
+    "minecraft:cobblestone",
+    "minecraft:smooth_stone",
+    "minecraft:stone_slab",
+    "minecraft:smooth_stone_slab",
+    "minecraft:oak_planks",
+    "minecraft:oak_slab",
+    "minecraft:oak_stairs",
+    "minecraft:glass",
+    "minecraft:white_concrete",
+    "minecraft:gray_concrete",
+    "minecraft:light_gray_concrete",
+    "minecraft:black_concrete"
+  ]
+}

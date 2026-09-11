@@ -4,9 +4,9 @@ import de.zurret.vanishingground.config.VanishingGroundConfig;
 import de.zurret.vanishingground.command.VanishingGroundCommand;
 import de.zurret.vanishingground.event.PlayerLifecycleHandler;
 import de.zurret.vanishingground.event.PlayerMovementHandler;
-import de.zurret.vanishingground.gamerule.ModGameRules;
 import de.zurret.vanishingground.protection.BlockProtectionRegistry;
 import de.zurret.vanishingground.removal.PendingRemovalScheduler;
+import de.zurret.vanishingground.removal.RestoreScheduler;
 import de.zurret.vanishingground.tracking.SupportPositionTracker;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -26,19 +26,21 @@ public final class VanishingGroundMod implements ModInitializer {
 
 	private final SupportPositionTracker tracker = new SupportPositionTracker();
 	private final BlockProtectionRegistry protectionRegistry = new BlockProtectionRegistry();
-	private final PendingRemovalScheduler scheduler = new PendingRemovalScheduler();
+	private final PendingRemovalScheduler removalScheduler = new PendingRemovalScheduler();
+	private final RestoreScheduler restoreScheduler = new RestoreScheduler();
 
 	@Override
 	public void onInitialize() {
 		VanishingGroundConfig config = VanishingGroundConfig.loadOrCreate();
-		VanishingGroundCommand.register(config);
+		VanishingGroundCommand.register(config, tracker, removalScheduler, restoreScheduler);
 
 		PlayerMovementHandler movementHandler =
-				new PlayerMovementHandler(tracker, protectionRegistry, scheduler, config);
+				new PlayerMovementHandler(tracker, protectionRegistry, removalScheduler, restoreScheduler, config);
 
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
 			movementHandler.tickPlayers(server);
-			scheduler.tick(server, tracker, protectionRegistry, config);
+			removalScheduler.tick(server, tracker, protectionRegistry, restoreScheduler, config);
+			restoreScheduler.tick(server, tracker);
 		});
 
 		PlayerLifecycleHandler.register(tracker);

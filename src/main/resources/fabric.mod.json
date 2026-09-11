@@ -3,7 +3,7 @@
   "id": "vanishingground",
   "version": "${version}",
   "name": "Vanishing Ground",
-  "description": "Solid ground you walk away from disappears once no player is standing on it anymore.",
+  "description": "Solid ground you walk away from disappears once no player is standing on it anymore. Safe defaults for singleplayer and multiplayer, with presets for parkour and challenge maps.",
   "authors": [
     "Zurret"
   ],
